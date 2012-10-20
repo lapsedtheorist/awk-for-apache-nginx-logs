@@ -1,6 +1,10 @@
 ##
 #	Web server log file analysis & filtering
 #
+#	v1.2; Oct 2012
+#	Ben Carpenter
+#	http://www.bencarpenter.co.uk/awk-for-apache-nginx-logs
+#
 #	This awk script processes lines from a log format that matches the
 #	'combined' log often used by the Apache and Nginx web servers. If your log
 #	file format is different, amend accordingly, but for reference this is the
@@ -8,13 +12,13 @@
 #
 #		%h %l %u %t "%r" %>s %b "%{Referer}i" "%{User-agent}i"
 #
-#	%h		Remote host
-#	%l		Remote logname (ignored)
-#	%u		Remote user (ignored)
-#	%t		Date and time of the request 
-#	%r		First line of the request, typically "GET /something HTTP/1.1"
-#	%>s		Status
-#	%b		Size of response in bytes
+#		%h		Remote host
+#		%l		Remote logname (ignored)
+#		%u		Remote user (ignored)
+#		%t		Date and time of the request
+#		%r		First line of the request, typically "GET /something HTTP/1.1"
+#		%>s		Status
+#		%b		Size of response in bytes
 #
 #	It tries to be efficient on resources, so there's minimal progress messages
 #	and no system commands in the main loop other than writing to a file based
@@ -25,17 +29,13 @@
 #	etc. The file format is:
 #
 #		IP, Date/Time, Method, URL, Status, Size, Referer, User Agent
-#	
+#
 #	You should be able to send a large (>1GB) amount of log data through this
 #	script quite comfortably. This works well for me, but usual clauses apply
 #	(use it at your own risk, etc.). Bug reports and suggestions for
 #	improvements are very welcome
-#
-#	v1.2; Oct 2012
-#	Ben Carpenter
-#	http://www.bencarpenter.co.uk/awk-for-apache-nginx-logs
 ##
-BEGIN { 
+BEGIN {
 	FS="( \"|\" )"
 	intro="Processing..."
 	printf "%s", intro
@@ -48,14 +48,14 @@ BEGIN {
 	# double quoted, which is therefore something that can foul our detection
 	# for the status code, unless we explicitly look for it
 	if($2!="") {
-		datetime=a[4]" "a[5] 
+		datetime=a[4]" "a[5]
 		request=$2
 		referer=$4
 		useragent=$6
 		split($3, c, " ")
 		code=c[1]
 		size=c[2]
-	} else { 
+	} else {
 		split($3, b, " ")
 		datetime=b[2]" "b[3]
 		request=$4
@@ -93,12 +93,12 @@ BEGIN {
 	url=substr(url, 2)
 
 	# Create and add to a file for each status code
-	file="http-status-"code".log" 
+	file="http-status-"code".log"
 	printf "%s\t%s\t%s\t%s\t%d\t%d\t%s\t%s\n", \
 		ip, datetime, method, url, code, size, referer, useragent > file
-	
+
 	# Create and add to a file for each request method
-	file="http-request-"method".log" 
+	file="http-request-"method".log"
 	printf "%s\t%s\t%s\t%s\t%d\t%d\t%s\t%s\n", \
 		ip, datetime, method, url, code, size, referer, useragent > file
 }

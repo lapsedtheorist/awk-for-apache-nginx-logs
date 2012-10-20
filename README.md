@@ -1,8 +1,8 @@
 Web server log file analysis & filtering
 ========================================
 
-v1.2; Oct 2012
-Ben Carpenter
+v1.2; Oct 2012  
+Ben Carpenter  
 http://www.bencarpenter.co.uk/awk-for-apache-nginx-logs
 
 This awk script processes lines from a log format that matches the
