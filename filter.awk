@@ -31,7 +31,7 @@
 #	(use it at your own risk, etc.). Bug reports and suggestions for
 #	improvements are very welcome
 #
-#	v1.1; Feb 2012
+#	v1.2; Oct 2012
 #	Ben Carpenter
 #	http://www.bencarpenter.co.uk/awk-for-apache-nginx-logs
 ##
@@ -66,6 +66,11 @@ BEGIN {
 		size=c[2]
 	}
 	total=NR
+	if(match(code, /^[0-9]+$/)==0) {
+		# This status code, whatever it is, isn't a number so let's set it to
+		# UNKNOWN so it's obvious in the analysis that this is a dud
+		code="UNKNOWN"
+	}
 	statuses[code]++
 
 	# Analyse the request
